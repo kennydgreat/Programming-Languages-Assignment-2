@@ -7,6 +7,7 @@ Limitations/Assumptions:
 1) Every customer has a first and last name.
 2) Every customer has a cell and home phone number.
 3) User can put in any string as the address. This program does not check to see if the address is valid. 
+4) User inputs a correct set of characters for a phone number. This program does not check to see if the phone number is valid.
 Notes: 
 */
 
@@ -23,6 +24,8 @@ Notes:
 char * enter_number_of_cus_message = "Please enter the number of customers you would like to save.\n";
 char * enter_numof_char_in_name_message = "Please enter the number of characters in this name.\n";
 char * enter_name_message = "Please enter the name.\n";
+char * enter_number_message = "Please enter the number.\n";
+char * enter_address_message = "Please enter the address.\n";
 
 //Structs
 //----------------------------------------------------
@@ -42,12 +45,12 @@ struct phone_numbers
 
 struct customer
 {
-	struct name * customer_name;
-	struct phone_number *customer_phone_number;
-	char * address;
+	struct full_name * customer_name;
+	struct phone_numbers *customer_phone_numbers;
+	char * customer_address;
 };
 
-//Function prototypes 
+//Function prototypes
 //------------------------------------------------------------------------------
 /*
 This method:
@@ -74,6 +77,30 @@ struct customer * allocate_memory_for_cus(int num_of_customers);
 
 */
 struct full_name * request_cus_full_name();
+
+/*This function
+1) requests a number from the user(could be home or cell)
+2) returns a pointer to the number which is stored as a char array
+*/
+char * request_number();
+/*This function
+1) creates a pointer to a phone_number struct using malloc
+2) using the request_number function gets the home and cell numbers 
+3)returns the pointer to the phone number struct
+*/
+struct phone_numbers * request_phone_numbers();
+/*This function:
+1) Asks the user for an address 
+2) Creates a pointer for the address using malloc
+3) set the pointer to the address and returns the pointer
+*/
+char * request_address();
+
+/*
+This method
+1) Given a pointer to an array of customer structs and the number of customers sorts the array in order of numbers*/
+void number_sort(struct customer * customers, int number_of_customers);
+
 
 //Function definitions
 //----------------------------------------------------------------------------------------------------
@@ -151,22 +178,110 @@ struct full_name * request_cus_full_name() {
 	cus_full_name->last_name = request_name();//Setting last name
 	return cus_full_name;
 }
+/*This method
+1) requests a number from the user(could be home or cell)
+2)request for a location in memory to store that number and stores the number
+2) returns the pointer to that location in memory.
+*/
+char * request_number() {
+	char user_input_buffer[USER_INPUT_BUFFER_SIZE]; // input from user
+	char * number; // number to be returned
+	printf(enter_number_message);//Asking user for a number
+	fgets(user_input_buffer, sizeof(user_input_buffer), stdin);
+	number = (char *)malloc(strlen(user_input_buffer) * sizeof(char) + ONE); // requesting memory to store number
+	if (!number)
+	{
+		printf("Memory allocation for number pointer failed.\n");
+		exit(1);
+	}
+	strcpy(number, user_input_buffer);//Sets the pointer to point to the name
+	return number;
+
+}
+/*This function
+1) creates a pointer to a phone_number struct using malloc
+2) using the request_number function gets the home and cell numbers
+3)returns the pointer to the phone number struct
+*/
+struct phone_numbers * request_phone_numbers(){
+	struct phone_numbers * cus_phone_numbers;
+	cus_phone_numbers = (struct phone_numbers *) malloc(sizeof(struct phone_numbers)); 
+	if (!cus_phone_numbers)
+	{
+		printf("Memory allocation for phone_numbers pointer failed");
+		exit(1);
+	}
+	cus_phone_numbers->cell = request_number();
+	cus_phone_numbers->home = request_number();
+	return cus_phone_numbers;
+}
+
+/*This function:
+1) Asks the user for an address
+2) Creates a pointer for the address using malloc
+3) set the pointer to the address and returns the pointer
+*/
+char * request_address() {
+	char user_input_buffer[USER_INPUT_BUFFER_SIZE];//User input buffer
+	char * cus_address; //pointer to the wherer the address will be stored
+
+	printf(enter_address_message);//Asking user for a address
+	fgets(user_input_buffer, sizeof(user_input_buffer), stdin);
+	cus_address = (char *)malloc(strlen(user_input_buffer) * sizeof(char) + ONE); // requesting memory to store number
+	if (!cus_address) {
+		printf("Memory allocatoin for cus_address failed.\n");
+		exit(1);
+	}
+
+	strcpy(cus_address, user_input_buffer);
+	return cus_address;
+}
+/*This method
+1) Given a pointer to an array of customer structs sorts the array in order of home phone numbers
+*/
+void number_sort(struct customer * customers, int number_of_customers) {
+	int i, j; // counters
+	char * temp;
+	
+	for (i = 0; i <= number_of_customers; i++) {
+		for (j = i+1; j <= number_of_customers; j++){
+			if (strcmp(customers[i].customer_phone_numbers->home, customers[j].customer_phone_numbers->home)> 0)
+			{
+				strcpy(temp, customers[i].customer_phone_numbers->home);
+				strcpy(customers[i].customer_phone_numbers->home, customers[j].customer_phone_numbers->home);
+				strcpy(customers[j].customer_phone_numbers->home, temp);
+			}
+		}
+	}
+}
 //Program main
 //-------------------------------------------------------
 int main()
 {
 	struct customer * customers; //pointer to the array of customers
 	int number_of_customers; 
+	int i; //counter
 	number_of_customers =  request_for_num_of_cus();//Asks for the number of customers and sets cusomters to be a 
 	//pointer to location in memory that can hold that many customer structs.
 	
 	customers = allocate_memory_for_cus(number_of_customers);
-	printf("Now please enter customer %d full name starting with the firstname then the lastname\n");
-	customers[0].customer_name = request_cus_full_name();
-	
+	//printf("Now please enter customer %d full name starting with the firstname then the lastname\n", number_of_customers);
+	for (i = 0; i < number_of_customers; i++) {
+		customers[i].customer_name = request_cus_full_name();
+		customers[i].customer_phone_numbers = request_phone_numbers();
+		customers[i].customer_address = request_address();
 
+	}
 
-
+	//Releasing the block memory of being used
+	for ( i = 0; i < number_of_customers; i++)
+	{
+		free(customers[i].customer_name);
+		free(customers[i].customer_phone_numbers);
+		free(customers[i].customer_address);
+		free(customers[i]);
+	}
+	free(customers);
     return 0;
 }
 
