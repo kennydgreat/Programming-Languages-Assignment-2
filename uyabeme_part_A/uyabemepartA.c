@@ -26,7 +26,10 @@ char * enter_numof_char_in_name_message = "Please enter the number of characters
 char * enter_name_message = "Please enter the name.\n";
 char * enter_number_message = "Please enter the number.\n";
 char * enter_address_message = "Please enter the address.\n";
-
+char * enter_first_name_message = "Please enter their first name.\n";
+char * enter_last_name_message = "Now enter their last name.\n";
+char * enter_home_phone_message = "Now enter their homephone number.\n";
+char * enter_cell_phone_message = "Now enter their cellphone number.\n";
 //Structs
 //----------------------------------------------------
 //struct for the cumstomer's name
@@ -99,19 +102,31 @@ char * request_address();
 /*
 This method
 1) Given a pointer to an array of customer structs and the number of customers sorts the array in order of numbers*/
-void number_sort(struct customer * customers, int number_of_customers);
+void name_sort(struct customer * customers, int number_of_customers);
 
 /*This function
 1) prints out all customer info 
 */
 static void display_all_customers_info(struct customers* customer_from_user, int num_of_customers);
-//Function definitions
-//----------------------------------------------------------------------------------------------------
+
+/*This method
+1) Given a pointer to an array of customer structs makes all customers which have the same name are sorted
+by their home phone number
+*/
+void number_sort(struct customer * customers, int number_of_customers);
 /*
 This method:
 1)Asks the user for the number of customers they would like enter
 2) returns the number
 */
+/*This function gotten from
+https://stackoverflow.com/questions/12646734/how-to-sort-an-array-of-string-alphabetically-case-sensitive-nonstandard-colla
+1)Compares strings but does so with case insentivity so ABC and abc are seen as the same
+2) Alright from the first feature, it is just the same "strcmp".
+*/
+int strcasecmp(const char *a, const char *b);
+//Function definitions
+//----------------------------------------------------------------------------------------------------
 
 
 int request_for_num_of_cus() {
@@ -154,7 +169,7 @@ of the name
 char * request_name(){
 	char user_input_buffer[USER_INPUT_BUFFER_SIZE]; //buffer to store user_input
 	char * name; //holds the name gotten from the user, could be the last or first name
-	printf(enter_name_message); // Asking user for the name
+	//printf(enter_name_message); // Asking user for the name
 	fgets(user_input_buffer, sizeof(user_input_buffer), stdin);
 	//*** ERORR HANDLING HERE!!!!**
 
@@ -177,7 +192,9 @@ char * request_name(){
 struct full_name * request_cus_full_name() {
 	struct full_name * cus_full_name; //customer's full name
 	cus_full_name = (struct full_name *) malloc(sizeof(struct full_name));
+	printf(enter_first_name_message);//Ask for first name
 	cus_full_name->first_name = request_name();//Setting first name
+	printf(enter_last_name_message);//Ask for first name
 	cus_full_name->last_name = request_name();//Setting last name
 	return cus_full_name;
 }
@@ -189,7 +206,7 @@ struct full_name * request_cus_full_name() {
 char * request_number() {
 	char user_input_buffer[USER_INPUT_BUFFER_SIZE]; // input from user
 	char * number; // number to be returned
-	printf(enter_number_message);//Asking user for a number
+	//printf(enter_number_message);//Asking user for a number
 	fgets(user_input_buffer, sizeof(user_input_buffer), stdin);
 	number = (char *)malloc(strlen(user_input_buffer) * sizeof(char) + ONE); // requesting memory to store number
 	if (!number)
@@ -214,8 +231,10 @@ struct phone_numbers * request_phone_numbers(){
 		printf("Memory allocation for phone_numbers pointer failed");
 		exit(1);
 	}
-	cus_phone_numbers->cell = request_number();
+	printf(enter_home_phone_message); //Ask for homephone number
 	cus_phone_numbers->home = request_number();
+	printf(enter_cell_phone_message); //Ask for cellphone number
+	cus_phone_numbers->cell = request_number();
 	return cus_phone_numbers;
 }
 
@@ -242,20 +261,17 @@ char * request_address() {
 /*This method
 1) Given a pointer to an array of customer structs sorts the array in order of home phone numbers
 */
-void number_sort(struct customer * customers, int number_of_customers) {
+void name_sort(struct customer * customers, int number_of_customers) {
 	int i, j; // counters
-	char * temp;
+	struct customer temp;
 	
-	for (i = 0; i < number_of_customers-1; i++) {
-		for (j = i+1; j < number_of_customers-1; j++){
-			if (strcmp(customers[i].customer_phone_numbers->home, customers[j].customer_phone_numbers->home)> 0)
+	for (i = 0; i <= number_of_customers-1; i++) {
+		for (j = i+1; j <= number_of_customers-1; j++){
+			if (strcasecmp(customers[i].customer_name->last_name, customers[j].customer_name->last_name)> 0)
 			{
-				//strcpy(temp, customers[i].customer_phone_numbers->home);
-				//strcpy(customers[i].customer_phone_numbers->home, customers[j].customer_phone_numbers->home);
-				//strcpy(customers[j].customer_phone_numbers->home, temp);
-				temp = customers[i].customer_phone_numbers->home;
-				customers[i].customer_phone_numbers->home = customers[j].customer_phone_numbers->home;
-				customers[j].customer_phone_numbers->home = temp;
+				temp = customers[i];
+				customers[i] = customers[j];
+				customers[j] = temp;
 			}
 		}
 	}
@@ -264,18 +280,60 @@ void number_sort(struct customer * customers, int number_of_customers) {
 /*This function
 1) prints out all customer info
 */
-static void display_all_customer_info(struct customer* customers_from_user, int num_of_customers) {
+static void display_all_customers_info(struct customer* customers_from_user, int num_of_customers) {
 	int i; // counter
 	for (i = 0; i < num_of_customers; i++)
 	{
-		printf("Customer %d info:\n   Name: %s %s\n   Phone Numbers: Home- %s Cell- %s\n  Address: %s\n",
+		/*printf("Customer %d info:\n   Name: %s %s\n   Phone Numbers: Home%sCell%s\n  Address: %s\n",
 			i,
 			customers_from_user[i].customer_name->first_name,
 			customers_from_user[i].customer_name->last_name,
 			customers_from_user[i].customer_phone_numbers->home,
 			customers_from_user[i].customer_phone_numbers->cell,
 			customers_from_user[i].customer_address
-			);
+			);*/
+		printf("%s %s\n",customers_from_user[i].customer_name->last_name, customers_from_user[i].customer_phone_numbers->home);
+	}
+}
+/*This function gotten from 
+https://stackoverflow.com/questions/12646734/how-to-sort-an-array-of-string-alphabetically-case-sensitive-nonstandard-colla
+1)Compares strings but does so with case insentivity so ABC and abc are seen as the same
+2) Alright from the first feature, it is just the same "strcmp".
+*/
+int strcasecmp(const char *a, const char *b) {
+	while (*a && *b) {
+		if (tolower(*a) != tolower(*b)) {
+			break;
+		}
+		++a;
+		++b;
+	}
+	return tolower(*a) - tolower(*b);
+}
+
+/*This method
+1) Given a pointer to an array of customer structs makes all customers which have the same name are sorted
+by their home phone number
+*/
+void number_sort(struct customer * customers, int number_of_customers) {
+	int i, j; // counters
+	struct customer temp;
+
+	for (i = 0; i <= number_of_customers - 1; i++) {
+		for (j = i + 1; j <= number_of_customers - 1; j++) {
+			if (strcasecmp(customers[i].customer_name->last_name, customers[j].customer_name->last_name)== 0)
+			{
+				//strcpy(temp, customers[i].customer_phone_numbers->home);
+				//strcpy(customers[i].customer_phone_numbers->home, customers[j].customer_phone_numbers->home);
+				//strcpy(customers[j].customer_phone_numbers->home, temp);
+
+				if (strcasecmp(customers[i].customer_phone_numbers->home, customers[j].customer_phone_numbers->home) > 0){
+					temp = customers[i];
+					customers[i] = customers[j];
+					customers[j] = temp;
+				}
+			}
+		}
 	}
 }
 //Program main
@@ -293,13 +351,17 @@ int main()
 	for (i = 0; i < number_of_customers; i++) {
 		customers[i].customer_name = request_cus_full_name();
 		customers[i].customer_phone_numbers = request_phone_numbers();
-		customers[i].customer_address = request_address();
+		//customers[i].customer_address = request_address();
 
 	}
 	 
-	display_all_customer_info(customers, number_of_customers);
+	display_all_customers_info(customers, number_of_customers);
+	name_sort(customers,number_of_customers);
+	printf("After name sorting\n");
+	display_all_customers_info(customers, number_of_customers);
 	number_sort(customers, number_of_customers);
-	display_all_customer_info(customers, number_of_customers);
+	printf("After number sorting\n");
+	display_all_customers_info(customers, number_of_customers);
 	while (1);
 	//Releasing the block memory of being used
 	for ( i = 0; i < number_of_customers; i++)
