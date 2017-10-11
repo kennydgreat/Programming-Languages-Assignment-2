@@ -101,7 +101,10 @@ This method
 1) Given a pointer to an array of customer structs and the number of customers sorts the array in order of numbers*/
 void number_sort(struct customer * customers, int number_of_customers);
 
-
+/*This function
+1) prints out all customer info 
+*/
+static void display_all_customers_info(struct customers* customer_from_user, int num_of_customers);
 //Function definitions
 //----------------------------------------------------------------------------------------------------
 /*
@@ -243,15 +246,36 @@ void number_sort(struct customer * customers, int number_of_customers) {
 	int i, j; // counters
 	char * temp;
 	
-	for (i = 0; i <= number_of_customers; i++) {
-		for (j = i+1; j <= number_of_customers; j++){
+	for (i = 0; i < number_of_customers-1; i++) {
+		for (j = i+1; j < number_of_customers-1; j++){
 			if (strcmp(customers[i].customer_phone_numbers->home, customers[j].customer_phone_numbers->home)> 0)
 			{
-				strcpy(temp, customers[i].customer_phone_numbers->home);
-				strcpy(customers[i].customer_phone_numbers->home, customers[j].customer_phone_numbers->home);
-				strcpy(customers[j].customer_phone_numbers->home, temp);
+				//strcpy(temp, customers[i].customer_phone_numbers->home);
+				//strcpy(customers[i].customer_phone_numbers->home, customers[j].customer_phone_numbers->home);
+				//strcpy(customers[j].customer_phone_numbers->home, temp);
+				temp = customers[i].customer_phone_numbers->home;
+				customers[i].customer_phone_numbers->home = customers[j].customer_phone_numbers->home;
+				customers[j].customer_phone_numbers->home = temp;
 			}
 		}
+	}
+}
+
+/*This function
+1) prints out all customer info
+*/
+static void display_all_customer_info(struct customer* customers_from_user, int num_of_customers) {
+	int i; // counter
+	for (i = 0; i < num_of_customers; i++)
+	{
+		printf("Customer %d info:\n   Name: %s %s\n   Phone Numbers: Home- %s Cell- %s\n  Address: %s\n",
+			i,
+			customers_from_user[i].customer_name->first_name,
+			customers_from_user[i].customer_name->last_name,
+			customers_from_user[i].customer_phone_numbers->home,
+			customers_from_user[i].customer_phone_numbers->cell,
+			customers_from_user[i].customer_address
+			);
 	}
 }
 //Program main
@@ -272,7 +296,11 @@ int main()
 		customers[i].customer_address = request_address();
 
 	}
-
+	 
+	display_all_customer_info(customers, number_of_customers);
+	number_sort(customers, number_of_customers);
+	display_all_customer_info(customers, number_of_customers);
+	while (1);
 	//Releasing the block memory of being used
 	for ( i = 0; i < number_of_customers; i++)
 	{
