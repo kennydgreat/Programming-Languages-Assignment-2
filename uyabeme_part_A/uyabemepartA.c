@@ -169,7 +169,6 @@ of the name
 char * request_name(){
 	char user_input_buffer[USER_INPUT_BUFFER_SIZE]; //buffer to store user_input
 	char * name; //holds the name gotten from the user, could be the last or first name
-	//printf(enter_name_message); // Asking user for the name
 	fgets(user_input_buffer, sizeof(user_input_buffer), stdin);
 	//*** ERORR HANDLING HERE!!!!**
 
@@ -284,15 +283,11 @@ static void display_all_customers_info(struct customer* customers_from_user, int
 	int i; // counter
 	for (i = 0; i < num_of_customers; i++)
 	{
-		/*printf("Customer %d info:\n   Name: %s %s\n   Phone Numbers: Home%sCell%s\n  Address: %s\n",
-			i,
-			customers_from_user[i].customer_name->first_name,
+		printf("Customer %d\n Name:%s      %sHomePhone: %sCellPhone: %sAddress: %s\n",i+1,customers_from_user[i].customer_name->first_name, 
 			customers_from_user[i].customer_name->last_name,
 			customers_from_user[i].customer_phone_numbers->home,
 			customers_from_user[i].customer_phone_numbers->cell,
-			customers_from_user[i].customer_address
-			);*/
-		printf("%s %s\n",customers_from_user[i].customer_name->last_name, customers_from_user[i].customer_phone_numbers->home);
+			customers_from_user[i].customer_address);
 	}
 }
 /*This function gotten from 
@@ -323,10 +318,6 @@ void number_sort(struct customer * customers, int number_of_customers) {
 		for (j = i + 1; j <= number_of_customers - 1; j++) {
 			if (strcasecmp(customers[i].customer_name->last_name, customers[j].customer_name->last_name)== 0)
 			{
-				//strcpy(temp, customers[i].customer_phone_numbers->home);
-				//strcpy(customers[i].customer_phone_numbers->home, customers[j].customer_phone_numbers->home);
-				//strcpy(customers[j].customer_phone_numbers->home, temp);
-
 				if (strcasecmp(customers[i].customer_phone_numbers->home, customers[j].customer_phone_numbers->home) > 0){
 					temp = customers[i];
 					customers[i] = customers[j];
@@ -347,11 +338,10 @@ int main()
 	//pointer to location in memory that can hold that many customer structs.
 	
 	customers = allocate_memory_for_cus(number_of_customers);
-	//printf("Now please enter customer %d full name starting with the firstname then the lastname\n", number_of_customers);
 	for (i = 0; i < number_of_customers; i++) {
 		customers[i].customer_name = request_cus_full_name();
 		customers[i].customer_phone_numbers = request_phone_numbers();
-		//customers[i].customer_address = request_address();
+		customers[i].customer_address = request_address();
 
 	}
 	 
@@ -362,16 +352,21 @@ int main()
 	number_sort(customers, number_of_customers);
 	printf("After number sorting\n");
 	display_all_customers_info(customers, number_of_customers);
-	while (1);
+	
 	//Releasing the block memory of being used
 	for ( i = 0; i < number_of_customers; i++)
 	{
+		free(customers[i].customer_name->first_name);
+		free(customers[i].customer_name->last_name);
 		free(customers[i].customer_name);
+		free(customers[i].customer_phone_numbers->cell);
+		free(customers[i].customer_phone_numbers->home);
 		free(customers[i].customer_phone_numbers);
 		free(customers[i].customer_address);
 		free(customers[i]);
 	}
 	free(customers);
+	while (1);
     return 0;
 }
 
