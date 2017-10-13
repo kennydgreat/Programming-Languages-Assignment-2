@@ -53,6 +53,11 @@ struct customer
 	char * customer_address;
 };
 
+
+
+
+
+
 //Function prototypes
 //------------------------------------------------------------------------------
 /*
@@ -125,6 +130,14 @@ https://stackoverflow.com/questions/12646734/how-to-sort-an-array-of-string-alph
 2) Alright from the first feature, it is just the same "strcmp".
 */
 int strcasecmp(const char *a, const char *b);
+
+/*
+*/
+
+
+
+
+
 //Function definitions
 //----------------------------------------------------------------------------------------------------
 
@@ -155,6 +168,7 @@ struct customer * allocate_memory_for_cus(int num_of_customers) {
 		printf("Memory allocation for customers pointer failed.\n");
 		exit(1);
 	}
+
 
 	return customers;
 }
@@ -283,7 +297,7 @@ static void display_all_customers_info(struct customer* customers_from_user, int
 	int i; // counter
 	for (i = 0; i < num_of_customers; i++)
 	{
-		printf("Customer %d\n Name:%s      %sHomePhone: %sCellPhone: %sAddress: %s\n",i+1,customers_from_user[i].customer_name->first_name, 
+		printf("Customer %d\n Name:%s      %s HomePhone: %s CellPhone: %s Address: %s\n",i+1,customers_from_user[i].customer_name->first_name, 
 			customers_from_user[i].customer_name->last_name,
 			customers_from_user[i].customer_phone_numbers->home,
 			customers_from_user[i].customer_phone_numbers->cell,
@@ -338,7 +352,9 @@ int main()
 	//pointer to location in memory that can hold that many customer structs.
 	
 	customers = allocate_memory_for_cus(number_of_customers);
+	printf("Now you can enter each Customer's info.\n");
 	for (i = 0; i < number_of_customers; i++) {
+		printf("Customer %d\n",i+1);
 		customers[i].customer_name = request_cus_full_name();
 		customers[i].customer_phone_numbers = request_phone_numbers();
 		customers[i].customer_address = request_address();
@@ -363,7 +379,6 @@ int main()
 		free(customers[i].customer_phone_numbers->home);
 		free(customers[i].customer_phone_numbers);
 		free(customers[i].customer_address);
-		free(customers[i]);
 	}
 	free(customers);
 	while (1);
